@@ -1,62 +1,44 @@
-import css from "./ContactForm.module.css";
+import { Field, Form, Formik } from "formik";
 import { useId } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { nanoid } from "nanoid";
+import { ErrorMessage } from "formik";
+import css from "./ContactForm.module.css";
 import { useDispatch } from "react-redux";
-import { addContact } from "../../redux/contactsSlice";
+import { addContact } from "../../redux/contactsOps";
 
-const alertMessage = Yup.object().shape({
-  name: Yup.string()
-    .min(3, "Too Short!")
-    .max(50, "Too Long!")
-    .required("Required"),
-  number: Yup.string()
-    .matches(/^\d{6,7}$/, "Number must be 6-7 digits long")
-    .required("Required"),
-});
-
-const initValue = {
-  name: "",
-  number: "",
-};
-
-function ContactForm() {
+export default function ContactForm() {
+  const nameFieldId = useId();
+  const telFieldId = useId();
   const dispatch = useDispatch();
 
-  const handleSubmit = (values, form) => {
-    const newUser = addContact({
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    });
+  const AddNewNumerSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(3, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+    number: Yup.string()
+      .matches(/^\+?[0-9\s\-()]{7,}$/, "invalid number")
+      .required("Required"),
+  });
 
-    dispatch(newUser);
+  const handleSubmit = (values, form) => {
+    dispatch(addContact(values));
     form.resetForm();
   };
 
-  const nameId = useId();
-  const numberId = useId();
-
   return (
     <Formik
-      initialValues={initValue}
+      initialValues={{ name: "", number: "" }}
       onSubmit={handleSubmit}
-      validationSchema={alertMessage}
+      validationSchema={AddNewNumerSchema}
     >
       <Form className={css.form}>
-        <div className={css.box}>
-          <label htmlFor={nameId}>Name</label>
-          <Field className={css.input} id={nameId} type="text" name="name" />
-          <ErrorMessage className={css.alert} name="name" component="span" />
-        </div>
-
-        <div className={css.box}>
-          <label htmlFor={numberId}>Number</label>
-          <Field className={css.input} id={numberId} type="tel" name="number" />
-          <ErrorMessage className={css.alert} name="number" component="span" />
-        </div>
-
+        <label htmlFor={nameFieldId}>Name</label>
+        <Field className={css.input} type="text" name="name" id={nameFieldId} />
+        <ErrorMessage className={css.error} name="name" component="span" />
+        <label htmlFor={telFieldId}>Number</label>
+        <Field className={css.input} type="tel" name="number" id={telFieldId} />
+        <ErrorMessage className={css.error} name="number" component="span" />
         <button className={css.button} type="submit">
           Add contact
         </button>
@@ -64,4 +46,3 @@ function ContactForm() {
     </Formik>
   );
 }
-export default ContactForm;

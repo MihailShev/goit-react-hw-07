@@ -1,25 +1,24 @@
+import { FaPhone } from "react-icons/fa6";
+import { IoPerson } from "react-icons/io5";
+
 import css from "./Contact.module.css";
-import { IoPerson, IoCallSharp } from "react-icons/io5";
 
-function Contact({ contacts: { id, name, number }, onClick }) {
+export default function Contact({ contact: { name, number, id }, onDelete }) {
   return (
-    <>
-      <div className={css.main_container}>
-        <div className={css.container}>
-          <IoPerson className={css.svg} size={15} />
-          <h2 className={css.title}>{name}</h2>
-        </div>
-
-        <div className={css.container}>
-          <IoCallSharp className={css.svg} size={15} />
-          <p className={css.number}>{number}</p>
-        </div>
+    <div className={css.item}>
+      <div>
+        <p className={css.name}>
+          <IoPerson className={css.icon} />
+          {name}
+        </p>
+        <p>
+          <FaPhone className={css.icon} />
+          {number}
+        </p>
       </div>
-      <button onClick={() => onClick(id)} className={css.button} type="button">
+      <button className={css.button} onClick={() => onDelete(id)}>
         Delete
       </button>
-    </>
+    </div>
   );
 }
-
-export default Contact;
